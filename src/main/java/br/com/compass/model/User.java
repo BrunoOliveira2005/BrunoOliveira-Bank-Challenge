@@ -1,43 +1,69 @@
 package br.com.compass.model;
 
+import java.time.LocalDate;
+
 public class User {
-    private int id;
+    private long id;
     private String name;
     private String cpf;
+    private LocalDate birthDate;
     private String phone;
     private String password;
-    private boolean isManager;
+    private String role;
     private boolean isBlocked;
+    private String accountType;
 
-    public User() {}
-
-    public User(String name, String cpf, String phone, String password, boolean isManager) {
+    public User(long id, String name, String cpf, LocalDate birthDate, String phone,
+                String password, String role, boolean isBlocked, String accountType) {
+        this.id = id;
         this.name = name;
         this.cpf = cpf;
+        this.birthDate = birthDate;
         this.phone = phone;
         this.password = password;
-        this.isManager = isManager;
-        this.isBlocked = false;
+        this.role = role;
+        this.isBlocked = isBlocked;
+        this.accountType = accountType;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // Getters e Setters
+    public long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
+    public String getCpf() {
+        return cpf;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getPhone() {
+        return phone;
+    }
 
-    public boolean isManager() { return isManager; }
-    public void setManager(boolean isManager) { this.isManager = isManager; }
+    public String getPassword() {
+        return password;
+    }
 
-    public boolean isBlocked() { return isBlocked; }
-    public void setBlocked(boolean isBlocked) { this.isBlocked = isBlocked; }
+    public String getRole() {
+        return role;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.isBlocked = blocked;
+    }
 }
