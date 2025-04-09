@@ -26,7 +26,7 @@ public class User {
         this.accountType = accountType;
     }
 
-    // Getters e Setters
+   
     public long getId() {
         return id;
     }

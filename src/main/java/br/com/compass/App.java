@@ -2,22 +2,25 @@ package br.com.compass;
 
 import br.com.compass.model.User;
 import br.com.compass.service.UserService;
+import br.com.compass.util.DatabaseConnection;
 
 import java.time.LocalDate;
 import java.util.Scanner;
 
 public class App {
 
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final UserService userService = new UserService(scanner);
-
     public static void main(String[] args) {
-        mainMenu();
+        DatabaseConnection.initializeDatabase();
+        Scanner scanner = new Scanner(System.in);
+        UserService userService = new UserService(scanner);
+
+        mainMenu(scanner, userService);
+
         scanner.close();
         System.out.println("Application closed");
     }
 
-    public static void mainMenu() {
+    public static void mainMenu(Scanner scanner, UserService userService) {
         boolean running = true;
 
         while (running) {
@@ -29,60 +32,98 @@ public class App {
             System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
-            scanner.nextLine(); // limpa buffer
+            scanner.nextLine();
 
             switch (option) {
-                case 1 -> login();
-                case 2 -> createAccount();
-                case 0 -> running = false;
-                default -> System.out.println("Invalid option! Please try again.");
+                case 1:
+                    System.out.print("CPF: ");
+                    String cpf = scanner.nextLine();
+                    System.out.print("Senha: ");
+                    String senha = scanner.nextLine();
+                    User loggedUser = userService.login(cpf, senha);
+                    if (loggedUser != null) {
+                        if (loggedUser.getRole().equals("GERENTE")) {
+                            gerenteMenu(scanner, userService);
+                        } else {
+                            clienteMenu(scanner); // Necessário implementar ainda 
+                        }
+                    }
+                    break;
+                case 2:
+                    System.out.println("========= Abertura de Conta =========");
+                    System.out.print("Nome completo: ");
+                    String name = scanner.nextLine();
+
+                    System.out.print("CPF: ");
+                    String newCpf = scanner.nextLine();
+
+                    System.out.print("Data de nascimento (YYYY-MM-DD): ");
+                    LocalDate birthDate = null;
+                    while (birthDate == null) {
+                        String birthDateInput = scanner.nextLine();
+                        try {
+                            birthDate = LocalDate.parse(birthDateInput);
+                        } catch (Exception e) {
+                            System.out.print("Formato inválido! Digite novamente (YYYY-MM-DD): ");
+                        }
+                    }
+
+                    System.out.print("Telefone: ");
+                    String phone = scanner.nextLine();
+
+                    System.out.print("Tipo de conta (Ex: Corrente, Salário): ");
+                    String accountType = scanner.nextLine();
+
+                    System.out.print("Senha: ");
+                    String password = scanner.nextLine();
+
+                    userService.registerUser(name, newCpf, birthDate, phone, password, accountType);
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println(" Opção inválida! Tente novamente.");
             }
         }
     }
 
-    private static void login() {
-        System.out.print("Digite seu CPF: ");
-        String cpf = scanner.nextLine();
+    public static void gerenteMenu(Scanner scanner, UserService userService) {
+        boolean running = true;
 
-        System.out.print("Digite sua senha: ");
-        String senha = scanner.nextLine();
+        while (running) {
+            System.out.println("========= Gerente Menu =========");
+            System.out.println("|| 1. Listar usuários bloqueados ||");
+            System.out.println("|| 2. Desbloquear usuário        ||");
+            System.out.println("|| 0. Voltar                     ||");
+            System.out.println("=================================");
+            System.out.print("Escolha uma opção: ");
 
-        User user = userService.login(cpf, senha);
+            int option = scanner.nextInt();
+            scanner.nextLine(); 
 
-        if (user != null) {
-            if ("GERENTE".equalsIgnoreCase(user.getRole())) {
-                menuGerente(user);
-            } else {
-                menuUsuario(user);
+            switch (option) {
+                case 1:
+                    userService.listarUsuariosBloqueados();
+                    break;
+                case 2:
+                    System.out.print("Informe o CPF do usuário a ser desbloqueado: ");
+                    String cpf = scanner.nextLine();
+                    userService.desbloquearUsuario(cpf);
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println(" Opção inválida.");
             }
         }
     }
 
-    private static void createAccount() {
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
+    public static void clienteMenu(Scanner scanner) {
+        boolean running = true;
 
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-
-        System.out.print("Data de nascimento (AAAA-MM-DD): ");
-        LocalDate nascimento = LocalDate.parse(scanner.nextLine());
-
-        System.out.print("Telefone: ");
-        String telefone = scanner.nextLine();
-
-        System.out.print("Tipo de conta (Corrente, Salário, etc): ");
-        String tipoConta = scanner.nextLine();
-
-        System.out.print("Senha: ");
-        String senha = scanner.nextLine();
-
-        userService.registerUser(nome, cpf, nascimento, telefone, senha, tipoConta);
-    }
-
-    private static void menuUsuario(User user) {
-        int option;
-        do {
+        while (running) {
             System.out.println("========= Bank Menu =========");
             System.out.println("|| 1. Deposit              ||");
             System.out.println("|| 2. Withdraw             ||");
@@ -93,45 +134,31 @@ public class App {
             System.out.println("=============================");
             System.out.print("Choose an option: ");
 
-            option = scanner.nextInt();
-            scanner.nextLine();
+            int option = scanner.nextInt();
+            scanner.nextLine(); 
 
             switch (option) {
-                case 1 -> System.out.println("Deposit.");
-                case 2 -> System.out.println("Withdraw.");
-                case 3 -> System.out.println("Check Balance.");
-                case 4 -> System.out.println("Transfer.");
-                case 5 -> System.out.println("Bank Statement.");
-                case 0 -> System.out.println("Exiting...");
-                default -> System.out.println("Invalid option! Please try again.");
+                case 1:
+                    System.out.println("Depósito");//necessário fazer
+                    break;
+                case 2:
+                    System.out.println("Saque");//necessário fazer
+                    break;
+                case 3:
+                    System.out.println("Visualizar saldo ");//necessário fazer
+                    break;
+                case 4:
+                    System.out.println("Transferência");//necessário fazer
+                    break;
+                case 5:
+                    System.out.println("Extrato bancário");//necessário fazer
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println(" Opção inválida! Tente novamente.");
             }
-
-        } while (option != 0);
-    }
-
-    private static void menuGerente(User user) {
-        int option;
-        do {
-            System.out.println("========= Gerente Menu =========");
-            System.out.println("1. Listar usuários bloqueados");
-            System.out.println("2. Desbloquear usuário");
-            System.out.println("0. Voltar");
-            System.out.print("Escolha uma opção: ");
-
-            option = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (option) {
-                case 1 -> userService.listarUsuariosBloqueados();
-                case 2 -> {
-                    System.out.print("Digite o CPF do usuário para desbloquear: ");
-                    String cpf = scanner.nextLine();
-                    userService.desbloquearUsuario(cpf);
-                }
-                case 0 -> System.out.println("Voltando...");
-                default -> System.out.println("Opção inválida.");
-            }
-
-        } while (option != 0);
+        }
     }
 }

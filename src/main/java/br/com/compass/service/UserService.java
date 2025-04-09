@@ -5,6 +5,7 @@ import br.com.compass.repository.UserRepository;
 import br.com.compass.util.PasswordEncryptor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserService {
@@ -21,23 +22,26 @@ public class UserService {
             String hashedPassword = PasswordEncryptor.encrypt(password);
             String role;
 
-            // Verifica se já existe algum gerente no banco
             if (!userRepository.existsGerente()) {
-                System.out.println("✅ Nenhum gerente cadastrado. Esta conta será GERENTE.");
+                System.out.println(" Nenhum gerente cadastrado. Esta conta será GERENTE.");
                 role = "GERENTE";
             } else {
-                System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
-                role = scanner.nextLine().toUpperCase();
+            	System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
+            	String input = scanner.nextLine().toUpperCase();
 
-                if (!role.equals("GERENTE") && !role.equals("CLIENTE")) {
-                    System.out.println("❌ Tipo inválido. Criando como CLIENTE por padrão.");
-                    role = "CLIENTE";
-                }
+            	if (input.equals("GERENTE")) {
+            	    role = "GERENTE";
+            	} else if (input.equals("CLIENTE")) {
+            	    role = "CLIENTE";
+            	} else {
+            	    System.out.println(" Tipo inválido. Criando como CLIENTE por padrão.");
+            	    role = "CLIENTE";
+            	}
             }
 
             User user = new User(0, name, cpf, birthDate, phone, hashedPassword, role, false, accountType);
             userRepository.save(user);
-            System.out.println("✅ Conta criada com sucesso!");
+            System.out.println(" Conta criada com sucesso!");
 
         } catch (Exception e) {
             System.out.println("Erro ao criar conta: " + e.getMessage());
@@ -48,50 +52,58 @@ public class UserService {
         User user = userRepository.findByCPF(cpf);
 
         if (user == null) {
-            System.out.println("❌ Usuário não encontrado.");
+            System.out.println(" Usuário não encontrado.");
             return null;
         }
 
         if (user.isBlocked()) {
-            System.out.println("🚫 Conta bloqueada. Solicite desbloqueio a um gerente.");
+            System.out.println(" Conta bloqueada. Solicite desbloqueio a um gerente.");
             return null;
         }
 
         int tentativas = 0;
         while (tentativas < 3) {
             if (PasswordEncryptor.matches(senha, user.getPassword())) {
-                System.out.println("✅ Login realizado com sucesso!");
+                System.out.println(" Login realizado com sucesso!");
                 return user;
             } else {
                 tentativas++;
                 if (tentativas < 3) {
-                    System.out.print("❌ Senha incorreta. Tente novamente: ");
+                    System.out.print(" Senha incorreta. Tente novamente: ");
                     senha = scanner.nextLine();
                 }
             }
         }
 
-        System.out.println("❌ 3 tentativas erradas. Conta será bloqueada.");
+        System.out.println(" 3 tentativas erradas. Conta será bloqueada.");
         userRepository.bloquearUsuario(user.getCpf());
         return null;
     }
 
     public void listarUsuariosBloqueados() {
+        List<User> bloqueados = userRepository.findBlockedUsers();
+
+        if (bloqueados.isEmpty()) {
+            System.out.println(" Nenhum usuário está bloqueado no momento.");
+            return;
+        }
+
         System.out.println("========= Usuários Bloqueados =========");
-        userRepository.findBlockedUsers().forEach(u -> {
+        for (User u : bloqueados) {
             System.out.println("Nome: " + u.getName() + " | CPF: " + u.getCpf());
-        });
+        }
     }
 
     public void desbloquearUsuario(String cpf) {
         User user = userRepository.findByCPF(cpf);
+
         if (user == null) {
-            System.out.println("❌ Usuário não encontrado.");
+            System.out.println(" Usuário não encontrado.");
         } else if (!user.isBlocked()) {
-            System.out.println("⚠️ Usuário não está bloqueado.");
+            System.out.println(" Este usuário não está bloqueado.");
         } else {
             userRepository.desbloquearUsuario(cpf);
-            System.out.println("✅ Usuário desbloqueado com sucesso!");
+            System.out.println(" Usuário desbloqueado com sucesso!");
         }
     }
 }
