@@ -1,12 +1,13 @@
 package br.com.compass;
 
-import br.com.compass.model.User;
-import br.com.compass.service.ReversalService;
-import br.com.compass.service.UserService;
-import br.com.compass.util.DatabaseConnection;
-
 import java.time.LocalDate;
 import java.util.Scanner;
+
+import br.com.compass.model.User;
+import br.com.compass.service.ReversalService;
+import br.com.compass.service.TransactionService;
+import br.com.compass.service.UserService;
+import br.com.compass.util.DatabaseConnection;
 
 public class App {
 
@@ -55,8 +56,13 @@ public class App {
                     System.out.print("Nome completo: ");
                     String name = scanner.nextLine();
 
-                    System.out.print("CPF: ");
-                    String newCpf = scanner.nextLine();
+                    System.out.print("Digite o CPF: ");
+                    String newCpf = scanner.nextLine().replaceAll("[^\\d]", ""); // remove tudo que não for dígito
+
+                    if (newCpf.length() != 11) {
+                        System.out.println("CPF inválido. Deve conter 11 dígitos.");
+                        return;
+                    }
 
                     System.out.print("Data de nascimento (YYYY-MM-DD): ");
                     String birthDateInput = scanner.nextLine();
@@ -128,6 +134,7 @@ public class App {
     public static void clienteMenu(Scanner scanner, User cliente) {
         boolean running = true;
         ReversalService reversalService = new ReversalService(scanner);
+        TransactionService transactionService = new TransactionService(scanner);
 
         while (running) {
             System.out.println("========= Bank Menu =========");
@@ -146,7 +153,7 @@ public class App {
 
             switch (option) {
                 case 1:
-                    System.out.println("Depósito (em construção).");
+                    transactionService.deposit(cliente);
                     break;
                 case 2:
                     System.out.println("Saque (em construção).");

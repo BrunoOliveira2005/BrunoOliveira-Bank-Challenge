@@ -1,12 +1,12 @@
 package br.com.compass.service;
 
+import java.util.Date;
+import java.util.Scanner;
+
 import br.com.compass.model.Transaction;
 import br.com.compass.model.User;
 import br.com.compass.repository.AccountRepository;
 import br.com.compass.repository.TransactionRepository;
-
-import java.util.Date;
-import java.util.Scanner;
 
 public class TransactionService {
 
@@ -30,7 +30,17 @@ public class TransactionService {
 
         accountRepository.updateBalance(user.getId(), amount);
 
-        Transaction transaction = new Transaction(0, user.getId(), amount, new Date(), "DEPOSITO", null);
+        Transaction transaction = new Transaction(
+            0,
+            user.getId(),
+            accountRepository.getAccountIdByUserId(user.getId()), // precisa garantir que esse método existe
+            amount,
+            new Date(),
+            "DEPOSITO",
+            "Depósito realizado na conta",
+            null
+        );
+
         transactionRepository.save(transaction);
 
         System.out.println("Depósito realizado com sucesso!");
@@ -50,7 +60,17 @@ public class TransactionService {
 
         accountRepository.updateBalance(user.getId(), -amount);
 
-        Transaction transaction = new Transaction(0, user.getId(), -amount, new Date(), "SAQUE", null);
+        Transaction transaction = new Transaction(
+            0,
+            user.getId(),
+            accountRepository.getAccountIdByUserId(user.getId()),
+            -amount,
+            new Date(),
+            "SAQUE",
+            "Saque realizado da conta",
+            null
+        );
+
         transactionRepository.save(transaction);
 
         System.out.println("Saque realizado com sucesso!");
@@ -60,9 +80,10 @@ public class TransactionService {
         System.out.print("Informe o CPF do destinatário: ");
         String destinoCpf = scanner.nextLine();
 
-        int destinoId = accountRepository.getAccountIdByCpf(destinoCpf);
+        int destinoAccountId = accountRepository.getAccountIdByCpf(destinoCpf);
+        int origemAccountId = accountRepository.getAccountIdByUserId(user.getId());
 
-        if (destinoId == 0 || destinoId == user.getId()) {
+        if (destinoAccountId == 0 || destinoAccountId == origemAccountId) {
             System.out.println("Conta destinatária inválida.");
             return;
         }
@@ -79,16 +100,20 @@ public class TransactionService {
         }
 
         accountRepository.updateBalance(user.getId(), -amount);
-        accountRepository.updateBalance(destinoId, amount);
+        accountRepository.updateBalanceByAccountId(destinoAccountId, amount); // novo método, se necessário
+
         Transaction transaction = new Transaction(
-        	    0,
-        	    user.getId(),
-        	    -amount,
-        	    new Date(),
-        	    "TRANSFERENCIA",
-        	    Long.valueOf(destinoId)
-        	);
-        	transactionRepository.save(transaction);
+            0,
+            user.getId(),
+            origemAccountId,
+            -amount,
+            new Date(),
+            "TRANSFERENCIA",
+            "Transferência para conta de CPF " + destinoCpf,
+            (long) destinoAccountId
+        );
+
+        transactionRepository.save(transaction);
 
         System.out.println("Transferência realizada com sucesso!");
     }
@@ -97,26 +122,26 @@ public class TransactionService {
         double balance = accountRepository.getBalance(user.getId());
         System.out.println("Saldo atual: R$ " + String.format("%.2f", balance));
     }
+
     public void reverterTransacao(int transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId);
-        
+
         if (transaction == null) {
             System.out.println("Transação não encontrada para estorno.");
             return;
         }
 
         long userId = transaction.getUserId();
+        int accountId = transaction.getAccountId();
         double valor = transaction.getAmount();
         String tipo = transaction.getType();
 
         switch (tipo.toUpperCase()) {
             case "DEPOSITO":
-                // Estornar um depósito
-                accountRepository.atualizarSaldo(userId, -valor);
+                accountRepository.updateBalance(userId, -valor);
                 break;
             case "SAQUE":
-                // Estornar um saque
-                accountRepository.atualizarSaldo(userId, valor);
+                accountRepository.updateBalance(userId, valor);
                 break;
             case "TRANSFERENCIA":
                 Long destinoId = transaction.getDestinationUserId();
@@ -124,9 +149,8 @@ public class TransactionService {
                     System.out.println("Transferência sem destino registrado. Estorno cancelado.");
                     return;
                 }
-                // Reverter a transferência
-                accountRepository.atualizarSaldo(destinoId, -valor); // tira o valor da outra conta
-                accountRepository.atualizarSaldo(userId, valor);     // devolve para origem
+                accountRepository.updateBalance(destinoId, -valor);
+                accountRepository.updateBalance(userId, valor);
                 break;
             default:
                 System.out.println("Tipo de transação não suportado para estorno.");
@@ -135,5 +159,4 @@ public class TransactionService {
 
         System.out.println("Transação estornada com sucesso.");
     }
-
 }

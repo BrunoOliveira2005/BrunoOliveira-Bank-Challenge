@@ -4,22 +4,22 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Account {
-    private int usuarioId;
+    private long userId;
     private String numeroConta;
     private BigDecimal saldo;
     private String tipoConta;
     private LocalDate dataCriacao;
 
-    public Account(int usuarioId, String numeroConta, BigDecimal saldo, String tipoConta, LocalDate dataCriacao) {
-        this.usuarioId = usuarioId;
+    public Account(long userId, String numeroConta, BigDecimal saldo, String tipoConta, LocalDate dataCriacao) {
+        this.userId = userId;
         this.numeroConta = numeroConta;
         this.saldo = saldo;
         this.tipoConta = tipoConta;
         this.dataCriacao = dataCriacao;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public long getUserId() {
+        return userId;
     }
 
     public String getNumeroConta() {

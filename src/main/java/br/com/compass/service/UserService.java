@@ -1,12 +1,14 @@
 package br.com.compass.service;
 
-import br.com.compass.model.User;
-import br.com.compass.repository.UserRepository;
-import br.com.compass.util.PasswordEncryptor;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+
+import br.com.compass.model.Account;
+import br.com.compass.model.User;
+import br.com.compass.repository.UserRepository;
+import br.com.compass.util.PasswordEncryptor;
 
 public class UserService {
 
@@ -26,26 +28,47 @@ public class UserService {
                 System.out.println(" Nenhum gerente cadastrado. Esta conta será GERENTE.");
                 role = "GERENTE";
             } else {
-            	System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
-            	String input = scanner.nextLine().toUpperCase();
+                System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
+                role = scanner.nextLine().toUpperCase();
 
-            	if (input.equals("GERENTE")) {
-            	    role = "GERENTE";
-            	} else if (input.equals("CLIENTE")) {
-            	    role = "CLIENTE";
-            	} else {
-            	    System.out.println(" Tipo inválido. Criando como CLIENTE por padrão.");
-            	    role = "CLIENTE";
-            	}
+                if (!role.equals("GERENTE") && !role.equals("CLIENTE")) {
+                    System.out.println(" Tipo inválido. Criando como CLIENTE por padrão.");
+                    role = "CLIENTE";
+                }
             }
 
+            // Cria e salva o usuário
             User user = new User(0, name, cpf, birthDate, phone, hashedPassword, role, false, accountType);
             userRepository.save(user);
+
+            // Recupera o ID do usuário recém-criado
+            User savedUser = userRepository.findByCPF(cpf);
+            if (savedUser == null) {
+                System.out.println("Erro ao buscar o usuário após salvamento.");
+                return;
+            }
+
+            // Gera conta bancária
+            String numeroConta = gerarNumeroConta();
+            Account conta = new Account(
+                savedUser.getId(),
+                numeroConta,
+                BigDecimal.ZERO,
+                accountType,
+                LocalDate.now()
+            );
+            AccountService accountService = new AccountService();
+            accountService.criarConta(conta);
+
             System.out.println(" Conta criada com sucesso!");
 
         } catch (Exception e) {
             System.out.println("Erro ao criar conta: " + e.getMessage());
         }
+    }
+
+    private String gerarNumeroConta() {
+        return String.valueOf(System.currentTimeMillis()).substring(5); // Geração simples de número de conta
     }
 
     public User login(String cpf, String senha) {
