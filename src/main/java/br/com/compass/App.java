@@ -163,7 +163,7 @@ public class App {
                     transactionService.checkBalance(cliente);
                     break;
                 case 4:
-                    System.out.println("Transferência (em construção).");
+                    transactionService.transfer(cliente);
                     break;
                 case 5:
                     System.out.println("Extrato bancário (em construção).");

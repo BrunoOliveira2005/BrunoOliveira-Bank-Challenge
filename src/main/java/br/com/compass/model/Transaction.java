@@ -25,6 +25,17 @@ public class Transaction {
         this.destinationUserId = destinationUserId;
     }
 
+    public Transaction(long userId, int accountId, double amount, Date date, String type, String descricao, Long destinationUserId) {
+        this.userId = userId;
+        this.accountId = accountId;
+        this.amount = amount;
+        this.date = date;
+        this.type = type;
+        this.descricao = descricao;
+        this.destinationUserId = destinationUserId;
+    }
+
+ 
     public int getId() {
         return id;
     }
