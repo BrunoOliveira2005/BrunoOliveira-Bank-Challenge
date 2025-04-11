@@ -40,6 +40,7 @@ public class App {
                 case 1:
                     System.out.print("CPF: ");
                     String cpf = scanner.nextLine();
+                    cpf = cpf.replaceAll("[^0-9]", "");
                     System.out.print("Senha: ");
                     String senha = scanner.nextLine();
                     User loggedUser = userService.login(cpf, senha);
@@ -156,7 +157,7 @@ public class App {
                     transactionService.deposit(cliente);
                     break;
                 case 2:
-                    System.out.println("Saque (em construção).");
+                    transactionService.withdraw(cliente);
                     break;
                 case 3:
                     System.out.println("Visualizar saldo (em construção).");
