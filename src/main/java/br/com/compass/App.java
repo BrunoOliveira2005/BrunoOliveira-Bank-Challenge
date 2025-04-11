@@ -144,7 +144,7 @@ public class App {
             System.out.println("|| 3. Check Balance          ||");
             System.out.println("|| 4. Transfer               ||");
             System.out.println("|| 5. Bank Statement         ||");
-            System.out.println("|| 6. Solicitar Estorno      ||");
+            System.out.println("|| 6. Request Reversal       ||");
             System.out.println("|| 0. Exit                   ||");
             System.out.println("=============================");
             System.out.print("Choose an option: ");
@@ -160,7 +160,7 @@ public class App {
                     transactionService.withdraw(cliente);
                     break;
                 case 3:
-                    System.out.println("Visualizar saldo (em construção).");
+                    transactionService.checkBalance(cliente);
                     break;
                 case 4:
                     System.out.println("Transferência (em construção).");
