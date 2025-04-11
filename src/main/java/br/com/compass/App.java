@@ -166,8 +166,25 @@ public class App {
                     transactionService.transfer(cliente);
                     break;
                 case 5:
-                    System.out.println("Extrato bancário (em construção).");
+                    System.out.println("Como deseja visualizar seu extrato?");
+                    System.out.println("1. Visualizar no terminal");
+                    System.out.println("2. Exportar para arquivo CSV");
+                    System.out.print("Escolha uma opção: ");
+                    int extratoOpcao = scanner.nextInt();
+                    scanner.nextLine();
+
+                    switch (extratoOpcao) {
+                        case 1:
+                            transactionService.listarExtrato(cliente);
+                            break;
+                        case 2:
+                            transactionService.exportarExtratoCSV(cliente);
+                            break;
+                        default:
+                            System.out.println("Opção inválida.");
+                    }
                     break;
+
                 case 6:
                     System.out.print("Informe o ID da transação a ser estornada: ");
                     int transacaoId = Integer.parseInt(scanner.nextLine());

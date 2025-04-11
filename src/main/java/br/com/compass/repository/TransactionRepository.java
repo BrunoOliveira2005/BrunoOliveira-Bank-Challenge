@@ -58,7 +58,7 @@ public class TransactionRepository {
                     rs.getTimestamp("data"),
                     rs.getString("tipo"),
                     rs.getString("descricao"),
-                    rs.getObject("destination_user_id") != null ? rs.getLong("destination_user_id") : null
+                    rs.getObject("destino_id") != null ? rs.getLong("destino_id") : null
                 );
             }
 
@@ -88,7 +88,7 @@ public class TransactionRepository {
                     rs.getTimestamp("data"),
                     rs.getString("tipo"),
                     rs.getString("descricao"),
-                    rs.getObject("destination_user_id") != null ? rs.getLong("destination_user_id") : null
+                    rs.getObject("destino_id") != null ? rs.getLong("destino_id") : null
                 );
                 transactions.add(transaction);
             }

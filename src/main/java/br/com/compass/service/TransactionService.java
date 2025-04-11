@@ -1,6 +1,9 @@
 package br.com.compass.service;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 import br.com.compass.model.Transaction;
@@ -142,4 +145,56 @@ public class TransactionService {
 
 		System.out.println("Transação estornada com sucesso.");
 	}
+	
+	public void listarExtrato(User user) {
+	    List<Transaction> transacoes = transactionRepository.findAllByUserId(user.getId());
+
+	    if (transacoes.isEmpty()) {
+	        System.out.println("Nenhuma transação encontrada.");
+	        return;
+	    }
+
+	    System.out.println("========= Extrato Bancário =========");
+	    for (Transaction t : transacoes) {
+	        System.out.printf("ID: %d | Tipo: %s | Valor: %.2f | Data: %s",
+	                t.getId(), t.getType(), t.getAmount(), t.getDate());
+	        if (t.getDestinationUserId() != null) {
+	            System.out.print(" | Destinatário: " + t.getDestinationUserId());
+	        }
+	        System.out.println();
+	    }
+	}
+	public void exportarExtratoCSV(User user) {
+	    List<Transaction> transacoes = transactionRepository.findAllByUserId(user.getId());
+
+	    if (transacoes.isEmpty()) {
+	        System.out.println("Nenhuma transação para exportar.");
+	        return;
+	    }
+
+	    String nomeArquivo = "extrato_user_" + user.getId() + ".csv";
+
+	    try (FileWriter writer = new FileWriter("output/extrato.csv");
+) {
+	        writer.append("ID,Tipo,Valor,Data,Destino\n");
+
+	        for (Transaction t : transacoes) {
+	            writer.append(String.format(
+	                "%d,%s,%.2f,%s,%s\n",
+	                t.getId(),
+	                t.getType(),
+	                t.getAmount(),
+	                t.getDate(),
+	                t.getDestinationUserId() != null ? t.getDestinationUserId() : ""
+	            ));
+	        }
+
+	        System.out.println("Extrato exportado com sucesso para: " + nomeArquivo);
+
+	    } catch (IOException e) {
+	        System.out.println("Erro ao exportar extrato: " + e.getMessage());
+	    }
+	}
+
+
 }
