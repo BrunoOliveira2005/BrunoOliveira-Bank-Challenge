@@ -34,13 +34,29 @@ public class UserService {
                 System.out.println(" Nenhum gerente cadastrado. Esta conta será GERENTE.");
                 role = "GERENTE";
             } else {
-                System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
-                role = scanner.nextLine().toUpperCase();
+            	if (!userRepository.existsGerente()) {
+            	    System.out.println(" Nenhum gerente cadastrado. Esta conta será GERENTE.");
+            	    role = "GERENTE";
+            	} else {
+            	    System.out.print("Você deseja criar uma conta como CLIENTE ou GERENTE? ");
+            	    role = scanner.nextLine().toUpperCase();
 
-                if (!role.equals("GERENTE") && !role.equals("CLIENTE")) {
-                    System.out.println(" Tipo inválido. Criando como CLIENTE por padrão.");
-                    role = "CLIENTE";
-                }
+            	    if (!role.equals("GERENTE") && !role.equals("CLIENTE")) {
+            	        System.out.println(" Tipo inválido. Criando como CLIENTE por padrão.");
+            	        role = "CLIENTE";
+            	    }
+
+            	    if (role.equals("GERENTE")) {
+            	        System.out.print("Digite o ID do gerente que está criando esta conta: ");
+            	        int gerenteCriadorId = Integer.parseInt(scanner.nextLine());
+
+            	        if (!usuarioEhGerente(gerenteCriadorId)) {
+            	            System.out.println(" Apenas um GERENTE pode criar outra conta GERENTE.");
+            	            return;
+            	        }
+            	    }
+            	}
+
             }
 
             // Cria e salva o usuário
