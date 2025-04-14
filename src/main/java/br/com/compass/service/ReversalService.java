@@ -1,9 +1,11 @@
 package br.com.compass.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
 import br.com.compass.model.Reversal;
+import br.com.compass.model.User;
 import br.com.compass.repository.ReversalRepository;
 
 public class ReversalService {
@@ -29,8 +31,10 @@ public class ReversalService {
         }
     }
 
-    public void solicitarEstorno(int transactionId) {
-        reversalRepository.solicitarEstorno(transactionId);
+    public void solicitarEstorno(User user, int transactionId) {
+        String motivo = "Solicitação de estorno pelo cliente";
+        LocalDateTime dataSolicitacao = LocalDateTime.now();
+        reversalRepository.solicitarEstorno((int) user.getId(), transactionId, motivo, dataSolicitacao);
         System.out.println("Solicitação de estorno enviada para análise.");
     }
 

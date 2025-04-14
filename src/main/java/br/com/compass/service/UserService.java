@@ -1,6 +1,11 @@
 package br.com.compass.service;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -8,6 +13,7 @@ import java.util.Scanner;
 import br.com.compass.model.Account;
 import br.com.compass.model.User;
 import br.com.compass.repository.UserRepository;
+import br.com.compass.util.DatabaseConnection;
 import br.com.compass.util.PasswordEncryptor;
 
 public class UserService {
@@ -68,7 +74,7 @@ public class UserService {
     }
 
     private String gerarNumeroConta() {
-        return String.valueOf(System.currentTimeMillis()).substring(5); // Geração simples de número de conta
+        return String.valueOf(System.currentTimeMillis()).substring(5); 
     }
 
     public User login(String cpf, String senha) {
@@ -128,5 +134,48 @@ public class UserService {
             userRepository.desbloquearUsuario(cpf);
             System.out.println(" Usuário desbloqueado com sucesso!");
         }
+    }
+    public boolean usuarioEhGerente(int userId) {
+        String sql = "SELECT role FROM users WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String role = rs.getString("role");
+                return "GERENTE".equals(role);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    		
+    public boolean cadastrarGerente(String name, String cpf, LocalDate birthDate, String phone, String password, long gerenteId) {
+        String sql = "INSERT INTO users (name, cpf, birth_date, phone, password, role, account_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setString(2, cpf);
+            stmt.setDate(3, Date.valueOf(birthDate));
+            stmt.setString(4, phone);
+            stmt.setString(5, password);
+            stmt.setString(6, "GERENTE"); 
+            stmt.setString(7, "SALARIO"); 
+
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -8,6 +8,7 @@ import br.com.compass.service.ReversalService;
 import br.com.compass.service.TransactionService;
 import br.com.compass.service.UserService;
 import br.com.compass.util.DatabaseConnection;
+import br.com.compass.util.PasswordEncryptor;
 
 public class App {
 
@@ -99,13 +100,13 @@ public class App {
             System.out.println("|| 2. Desbloquear usuário        ||");
             System.out.println("|| 3. Ver Estornos Pendentes     ||");
             System.out.println("|| 4. Aprovar Estorno            ||");
+            System.out.println("|| 5. Cadastrar novo gerente     ||"); 
             System.out.println("|| 0. Voltar                     ||");
             System.out.println("=================================");
             System.out.print("Escolha uma opção: ");
 
             int option = scanner.nextInt();
-            scanner.nextLine();
-
+            scanner.nextLine(); 
             switch (option) {
                 case 1:
                     userService.listarUsuariosBloqueados();
@@ -123,13 +124,18 @@ public class App {
                     int reversalId = Integer.parseInt(scanner.nextLine());
                     reversalService.aprovarEstorno(reversalId, gerente.getId());
                     break;
+                case 5:
+                    cadastrarNovoGerente(scanner, userService, gerente);
+                    break;
                 case 0:
                     running = false;
                     break;
                 default:
-                    System.out.println(" Opção inválida.");
+                    System.out.println("Opção inválida.");
             }
+            
         }
+        
     }
 
     public static void clienteMenu(Scanner scanner, User cliente) {
@@ -188,7 +194,8 @@ public class App {
                 case 6:
                     System.out.print("Informe o ID da transação a ser estornada: ");
                     int transacaoId = Integer.parseInt(scanner.nextLine());
-                    reversalService.solicitarEstorno(transacaoId);
+                    reversalService.solicitarEstorno(cliente, transacaoId);
+
                     break;
                 case 0:
                     running = false;
@@ -196,6 +203,38 @@ public class App {
                 default:
                     System.out.println(" Opção inválida! Tente novamente.");
             }
+            
+        }
+    }public static void cadastrarNovoGerente(Scanner scanner, UserService userService, User gerente) {
+        System.out.println("========= Cadastro de Novo Gerente =========");
+
+       
+        System.out.print("Nome do novo gerente: ");
+        String name = scanner.nextLine();
+
+        System.out.print("CPF do novo gerente: ");
+        String cpf = scanner.nextLine().replaceAll("[^\\d]", "");
+        
+        System.out.print("Data de nascimento (YYYY-MM-DD): ");
+        String birthDateInput = scanner.nextLine();
+        LocalDate birthDate = LocalDate.parse(birthDateInput);
+        
+        System.out.print("Telefone do novo gerente: ");
+        String phone = scanner.nextLine();
+
+        System.out.print("Senha do novo gerente: ");
+        String password = scanner.nextLine();
+        
+        String encryptedPassword = PasswordEncryptor.encrypt(password);
+
+        // Chama o método que cadastra o novo gerente
+        boolean sucesso = userService.cadastrarGerente(name, cpf, birthDate, phone, encryptedPassword, gerente.getId());
+
+        if (sucesso) {
+            System.out.println("Novo gerente cadastrado com sucesso!");
+        } else {
+            System.out.println("Falha ao cadastrar novo gerente.");
         }
     }
+
 }

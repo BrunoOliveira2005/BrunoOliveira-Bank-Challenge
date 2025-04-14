@@ -5,20 +5,27 @@ import java.time.LocalDateTime;
 public class Reversal {
     private int id;
     private int transactionId;
-    private String status; // PENDENTE, APROVADO, REJEITADO
+    private String status;
     private LocalDateTime requestDate;
     private boolean approved;
     private LocalDateTime approvedAt;
     private Long approvedBy;
+    private String motivo;
 
-    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate) {
+ 
+    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate,
+                    boolean approved, LocalDateTime approvedAt, Long approvedBy, String motivo) {
         this.id = id;
         this.transactionId = transactionId;
         this.status = status;
         this.requestDate = requestDate;
+        this.approved = approved;
+        this.approvedAt = approvedAt;
+        this.approvedBy = approvedBy;
+        this.motivo = motivo;
     }
-
-    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate, boolean approved, LocalDateTime approvedAt, Long approvedBy) {
+    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate,
+                    boolean approved, LocalDateTime approvedAt, Long approvedBy) {
         this.id = id;
         this.transactionId = transactionId;
         this.status = status;
@@ -28,6 +35,23 @@ public class Reversal {
         this.approvedBy = approvedBy;
     }
 
+   
+    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate, String motivo) {
+        this.id = id;
+        this.transactionId = transactionId;
+        this.status = status;
+        this.requestDate = requestDate;
+        this.motivo = motivo;
+    }
+
+    public Reversal(int id, int transactionId, String status, LocalDateTime requestDate) {
+        this.id = id;
+        this.transactionId = transactionId;
+        this.status = status;
+        this.requestDate = requestDate;
+    }
+
+  
     public int getId() {
         return id;
     }
@@ -56,6 +80,10 @@ public class Reversal {
         return approvedBy;
     }
 
+    public String getMotivo() {
+        return motivo;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -82,5 +110,9 @@ public class Reversal {
 
     public void setApprovedBy(Long approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
     }
 }

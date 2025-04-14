@@ -1,5 +1,6 @@
 package br.com.compass.service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
@@ -172,12 +173,21 @@ public class TransactionService {
 	        return;
 	    }
 
+	   
 	    String nomeArquivo = "extrato_user_" + user.getId() + ".csv";
+	    String caminhoArquivo = "C:\\temp2\\" + nomeArquivo;
 
-	    try (FileWriter writer = new FileWriter("output/extrato.csv");
-) {
+	   
+	    File pasta = new File("C:\\temp2");
+	    if (!pasta.exists()) {
+	        pasta.mkdirs(); 
+	    }
+
+	    try (FileWriter writer = new FileWriter(caminhoArquivo)) {
+	       
 	        writer.append("ID,Tipo,Valor,Data,Destino\n");
 
+	        
 	        for (Transaction t : transacoes) {
 	            writer.append(String.format(
 	                "%d,%s,%.2f,%s,%s\n",
@@ -189,7 +199,7 @@ public class TransactionService {
 	            ));
 	        }
 
-	        System.out.println("Extrato exportado com sucesso para: " + nomeArquivo);
+	        System.out.println("Extrato exportado com sucesso para: " + caminhoArquivo);
 
 	    } catch (IOException e) {
 	        System.out.println("Erro ao exportar extrato: " + e.getMessage());

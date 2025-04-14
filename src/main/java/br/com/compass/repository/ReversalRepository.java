@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,29 +110,40 @@ public class ReversalRepository {
     }
 
     // Nova solicitação de estorno
-    public void solicitarEstorno(int transactionId) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO reversals (transaction_id, status, request_date) VALUES (?, 'PENDENTE', NOW())";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, transactionId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } 
-    }
+    public void solicitarEstorno(int userId, int transactionId, String motivo, LocalDateTime dataSolicitacao) {
+    	String sql = "INSERT INTO reversals (transaction_id, user_id, motivo, status, data_solicitacao, request_date) VALUES (?, ?, ?, ?, ?, ?)";
+
+    	try (Connection conn = DatabaseConnection.getConnection();
+    	     PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+    	    stmt.setInt(1, transactionId);
+    	    stmt.setInt(2, userId);  
+    	    stmt.setString(3, motivo); 
+    	    stmt.setString(4, "PENDENTE");
+    	    stmt.setTimestamp(5, Timestamp.valueOf(dataSolicitacao));
+    	    stmt.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
+
+    	    stmt.executeUpdate();
+    	} catch (SQLException e) {
+    	    e.printStackTrace();
+    	    
+    	}	
+}
+    
     public boolean aprovarEstorno(int reversalId, long gerenteId) {
-        String sql = "UPDATE reversals SET approved = true, approved_at = NOW(), approved_by = ? WHERE id = ?";
+        String sql = "UPDATE reversals SET approved = true, approved_at = NOW(), approved_by = ?, status = 'APROVADO' WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setLong(1, gerenteId);
             stmt.setInt(2, reversalId);
+
+            // Se a atualização for bem-sucedida, retorna true
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao aprovar estorno: " + e.getMessage());
             return false;
         }
     }
-
-
 }
