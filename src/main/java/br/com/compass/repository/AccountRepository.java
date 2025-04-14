@@ -62,7 +62,7 @@ public class AccountRepository {
     }
 
     public void atualizarSaldo(long userId, double valor) {
-        updateBalance(userId, valor); // reutiliza o método acima
+        updateBalance(userId, valor);
     }
 
     public void save(Account conta) {

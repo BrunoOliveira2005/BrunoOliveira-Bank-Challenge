@@ -59,18 +59,18 @@ public class UserService {
 
             }
 
-            // Cria e salva o usuário
+           
             User user = new User(0, name, cpf, birthDate, phone, hashedPassword, role, false, accountType);
             userRepository.save(user);
 
-            // Recupera o ID do usuário recém-criado
+            
             User savedUser = userRepository.findByCPF(cpf);
             if (savedUser == null) {
                 System.out.println("Erro ao buscar o usuário após salvamento.");
                 return;
             }
 
-            // Gera conta bancária
+            
             String numeroConta = gerarNumeroConta();
             Account conta = new Account(
                 savedUser.getId(),

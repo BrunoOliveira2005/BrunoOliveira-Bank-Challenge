@@ -13,7 +13,7 @@ public class DatabaseConnection {
         return java.sql.DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-   //Teste de conexão
+   
     public static void main(String[] args) {
         try (Connection conn = getConnection()) {
             System.out.println("Conexão com o banco de dados bem-sucedida!");

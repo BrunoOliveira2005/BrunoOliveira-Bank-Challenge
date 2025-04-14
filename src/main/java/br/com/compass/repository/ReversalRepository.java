@@ -86,7 +86,7 @@ public class ReversalRepository {
             System.out.println("Erro ao atualizar estorno: " + e.getMessage());
         }
     }
- // Retorna os estornos 
+ 
     public List<Reversal> getReversalsByStatus(String status) {
         List<Reversal> reversals = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -109,7 +109,7 @@ public class ReversalRepository {
         return reversals;
     }
 
-    // Nova solicitação de estorno
+    
     public void solicitarEstorno(int userId, int transactionId, String motivo, LocalDateTime dataSolicitacao) {
     	String sql = "INSERT INTO reversals (transaction_id, user_id, motivo, status, data_solicitacao, request_date) VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -139,7 +139,7 @@ public class ReversalRepository {
             stmt.setLong(1, gerenteId);
             stmt.setInt(2, reversalId);
 
-            // Se a atualização for bem-sucedida, retorna true
+           
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Erro ao aprovar estorno: " + e.getMessage());

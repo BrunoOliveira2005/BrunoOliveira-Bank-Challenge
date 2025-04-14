@@ -42,8 +42,10 @@ public class App {
                     System.out.print("CPF: ");
                     String cpf = scanner.nextLine();
                     cpf = cpf.replaceAll("[^0-9]", "");
+                    
                     System.out.print("Senha: ");
                     String senha = scanner.nextLine();
+                    
                     User loggedUser = userService.login(cpf, senha);
                     if (loggedUser != null) {
                         if (loggedUser.getRole().equals("GERENTE")) {
@@ -59,7 +61,7 @@ public class App {
                     String name = scanner.nextLine();
 
                     System.out.print("Digite o CPF: ");
-                    String newCpf = scanner.nextLine().replaceAll("[^\\d]", ""); // remove tudo que não for dígito
+                    String newCpf = scanner.nextLine().replaceAll("[^\\d]", ""); 
 
                     if (newCpf.length() != 11) {
                         System.out.println("CPF inválido. Deve conter 11 dígitos.");
@@ -227,7 +229,7 @@ public class App {
         
         String encryptedPassword = PasswordEncryptor.encrypt(password);
 
-        // Chama o método que cadastra o novo gerente
+        
         boolean sucesso = userService.cadastrarGerente(name, cpf, birthDate, phone, encryptedPassword, gerente.getId());
 
         if (sucesso) {
